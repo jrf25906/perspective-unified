@@ -10,10 +10,30 @@ export class UserService {
   }
 
   static async create(userData: Partial<User>): Promise<User> {
-    const [user] = await db<User>('users')
-      .insert(userData)
-      .returning('*');
-    return user;
+    // Ensure timestamps are set
+    const dataWithTimestamps = {
+      ...userData,
+      created_at: userData.created_at || new Date(),
+      updated_at: userData.updated_at || new Date()
+    };
+
+    // PostgreSQL supports RETURNING, others need a separate query
+    if (db.client.config.client === 'postgresql') {
+      const [user] = await db<User>('users')
+        .insert(dataWithTimestamps)
+        .returning('*');
+      return user;
+    } else {
+      // For SQLite and others, insert then query
+      const [id] = await db<User>('users')
+        .insert(dataWithTimestamps);
+      
+      const user = await db<User>('users').where({ id }).first();
+      if (!user) {
+        throw new Error('Failed to retrieve created user');
+      }
+      return user;
+    }
   }
 
   static async findByEmail(email: string): Promise<User | undefined> {
@@ -44,19 +64,35 @@ export class UserService {
   }
 
   static async updateProfile(id: number, profileData: Partial<User>): Promise<User> {
-    const [updatedUser] = await db<User>('users')
-      .where({ id })
-      .update({
-        ...profileData,
-        updated_at: db.fn.now()
-      })
-      .returning('*');
-    
-    if (!updatedUser) {
-      throw new Error('User not found');
+    const updateData = {
+      ...profileData,
+      updated_at: db.fn.now()
+    };
+
+    if (db.client.config.client === 'postgresql') {
+      const [updatedUser] = await db<User>('users')
+        .where({ id })
+        .update(updateData)
+        .returning('*');
+      
+      if (!updatedUser) {
+        throw new Error('User not found');
+      }
+      
+      return updatedUser;
+    } else {
+      // For SQLite and others, update then query
+      await db<User>('users')
+        .where({ id })
+        .update(updateData);
+      
+      const updatedUser = await db<User>('users').where({ id }).first();
+      if (!updatedUser) {
+        throw new Error('User not found');
+      }
+      
+      return updatedUser;
     }
-    
-    return updatedUser;
   }
 
   static async isEmailTaken(email: string, excludeUserId?: number): Promise<boolean> {
