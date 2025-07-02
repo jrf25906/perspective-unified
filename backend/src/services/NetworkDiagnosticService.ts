@@ -37,7 +37,15 @@ export class NetworkDiagnosticService {
     
     // Log iOS-specific issues
     if (clientInfo.platform === 'ios' && !success) {
-      logger.warn(`iOS connection failure from ${clientInfo.identifier}: ${error?.message}`);
+      // Prevent recursive logging by checking if error message is a JSON string
+      let errorMessage = error?.message || 'Unknown error';
+      
+      // If error message looks like JSON or is too long, truncate it
+      if (errorMessage.startsWith('{') || errorMessage.length > 200) {
+        errorMessage = 'Error response (truncated to prevent recursion)';
+      }
+      
+      logger.warn(`iOS connection failure from ${clientInfo.identifier}: ${errorMessage}`);
       
       // Check for common iOS issues
       this.diagnoseIOSIssue(req, error);

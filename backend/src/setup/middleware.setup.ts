@@ -14,6 +14,11 @@ import { setupStaticFiles } from '../middleware/staticFiles';
 import { responseInterceptor, errorCorrelationMiddleware } from '../middleware/responseInterceptor';
 
 export function setupSecurityMiddleware(app: Express): void {
+    // Trust proxy for Railway deployment - fixes X-Forwarded-For header warning
+    if (process.env.NODE_ENV === 'production') {
+        app.set('trust proxy', true);
+    }
+    
     // Helmet security middleware
     app.use(helmet(helmetConfig));
     // CORS configuration
@@ -59,17 +64,19 @@ export function setupRequestMiddleware(app: Express): void {
     app.use(requestLogger);
     // Error correlation middleware for tracking errors
     app.use(errorCorrelationMiddleware);
-    // Response interceptor for consistent error formatting
+    // Event-based response interceptor for logging (safe - no method overriding)
     app.use(responseInterceptor);
-    // Network diagnostic middleware (before other middleware to catch all requests)
+    logger.info('✅ Event-based response interceptor enabled');
+    // Event-based network diagnostic middleware (safe - no method overriding)
     app.use(networkDiagnosticMiddleware());
-    // CORS violation tracking (after CORS middleware is applied)
-    app.use(corsViolationMiddleware());
-    // API response validation middleware (only in development)
+    logger.info('✅ Event-based network diagnostic middleware enabled');
+    // API response validation middleware (safe when used with event-based interceptors)
     if (isDevelopment) {
         app.use(validateApiResponse);
         logger.info('✅ API response validation middleware enabled');
     }
+    // CORS violation tracking (after CORS middleware is applied)
+    app.use(corsViolationMiddleware());
 }
 
 export function setupMaintenanceMiddleware(app: Express): void {

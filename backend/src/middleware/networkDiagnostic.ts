@@ -1,48 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { NetworkDiagnosticService } from '../services/NetworkDiagnosticService';
 
 /**
- * Middleware to track network connectivity and diagnose issues
- * Follows Open/Closed Principle - open for extension, closed for modification
+ * Event-based network diagnostic middleware - NO method overriding to prevent conflicts
+ * Uses Express events to track network issues without interfering with other middleware
  */
 export function networkDiagnosticMiddleware() {
   return (req: Request, res: Response, next: NextFunction) => {
     const startTime = Date.now();
     
-    // Track response completion
-    const originalEnd = res.end;
-    const originalJson = res.json;
-    
     // Flag to track if response was sent
     let responseSent = false;
     let responseError: Error | undefined;
     
-    // Override end method
-    res.end = function(...args: any[]) {
+    // Use event-based approach - listen for response completion
+    res.on('finish', () => {
       const duration = Date.now() - startTime;
       responseSent = true;
       
-      // Log successful connection
-      NetworkDiagnosticService.logConnectionAttempt(req, true);
-      
-      // Call original end
-      return originalEnd.apply(this, args);
-    };
-    
-    // Override json method to catch error responses
-    res.json = function(body: any) {
-      responseSent = true;
-      
-      // Check if this is an error response
+      // Check if this was an error response
       if (res.statusCode >= 400) {
-        responseError = new Error(body?.error?.message || `HTTP ${res.statusCode}`);
+        // Create a simple error object with just the status code
+        // Avoid passing response body to prevent recursive logging
+        responseError = new Error(`HTTP ${res.statusCode}`);
+        // Ensure the error doesn't contain the response body
+        responseError.name = 'HTTPError';
         NetworkDiagnosticService.logConnectionAttempt(req, false, responseError);
       } else {
         NetworkDiagnosticService.logConnectionAttempt(req, true);
       }
-      
-      return originalJson.call(this, body);
-    };
+    });
     
     // Handle request errors
     req.on('error', (error: Error) => {

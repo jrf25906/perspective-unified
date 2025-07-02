@@ -1,62 +1,84 @@
 import logger from '../utils/logger';
 import { Request, Response, NextFunction } from 'express';
 import { ChallengeResponse, AuthResponse, UserResponse, validateChallengeResponse, validateAuthResponse, ChallengeStatsResponse, LeaderboardEntryResponse, ChallengeResultResponse } from '../types/api-contracts';
+
+// Store the ACTUAL original Express json method before any middleware overrides it
+const EXPRESS_ORIGINAL_JSON = Response.prototype.json;
+
 /**
- * Middleware to validate API responses match iOS expectations
- * Prevents runtime decoding errors in the iOS app
+ * Event-based middleware to validate API responses match iOS expectations
+ * NO method overriding to prevent conflicts - uses response events instead
  */
 export function validateApiResponse(req: Request, res: Response, next: NextFunction) {
-    // Override res.json to validate responses
-    const originalJson = res.json.bind(res);
-    res.json = function (body: any) {
-        const endpoint = req.originalUrl;
+    const endpoint = req.originalUrl;
+    
+    // Store original json method for potential error responses
+    const originalJson = EXPRESS_ORIGINAL_JSON.bind(res);
+    
+    // Store validation state
+    let validationPassed = true;
+    let validationError: Error | null = null;
+    
+    // Override json method ONLY to capture response data for validation
+    const originalJsonMethod = res.json;
+    res.json = function(body: any) {
         try {
-            // Validate based on endpoint
-            if (endpoint.includes('/challenge/today')) {
-                validateChallengeEndpoint(body, 'today');
-            }
-            else if (endpoint.includes('/challenge/stats')) {
-                validateChallengeStatsEndpoint(body);
-            }
-            else if (endpoint.includes('/challenge/leaderboard')) {
-                validateLeaderboardEndpoint(body);
-            }
-            else if (endpoint.includes('/challenge') && endpoint.includes('/submit')) {
-                validateChallengeSubmitEndpoint(body);
-            }
-            else if (endpoint.includes('/auth/')) {
-                validateAuthEndpoint(body, endpoint);
-            }
-            else if (endpoint.includes('/profile/echo-score/history')) {
-                validateEchoScoreHistoryEndpoint(body);
-            }
-            else if (endpoint.includes('/profile/echo-score')) {
-                validateEchoScoreEndpoint(body);
-            }
-            else if (endpoint.includes('/profile')) {
-                validateUserEndpoint(body);
-            }
-            // Log successful validation in development
-            if (process.env.NODE_ENV === 'development') {
+            // Only validate non-error responses in development
+            if (!body?.error && process.env.NODE_ENV === 'development') {
+                // Validate based on endpoint
+                if (endpoint.includes('/challenge/today')) {
+                    validateChallengeEndpoint(body, 'today');
+                }
+                else if (endpoint.includes('/challenge/stats')) {
+                    validateChallengeStatsEndpoint(body);
+                }
+                else if (endpoint.includes('/challenge/leaderboard')) {
+                    validateLeaderboardEndpoint(body);
+                }
+                else if (endpoint.includes('/challenge') && endpoint.includes('/submit')) {
+                    validateChallengeSubmitEndpoint(body);
+                }
+                else if (endpoint.includes('/auth/')) {
+                    validateAuthEndpoint(body, endpoint);
+                }
+                else if (endpoint.includes('/profile/echo-score/history')) {
+                    validateEchoScoreHistoryEndpoint(body);
+                }
+                else if (endpoint.includes('/profile/echo-score')) {
+                    validateEchoScoreEndpoint(body);
+                }
+                else if (endpoint.includes('/profile')) {
+                    validateUserEndpoint(body);
+                }
+                
+                // Log successful validation
                 logger.info(`✅ Response validation passed for ${endpoint}`);
+                validationPassed = true;
             }
         }
         catch (error) {
+            validationError = error as Error;
+            validationPassed = false;
             logger.error(`❌ Response validation failed for ${endpoint}:`, error);
-            // In development, return validation error
-            if (process.env.NODE_ENV === 'development') {
-                return originalJson({
+            
+            // In development, return validation error instead of original response
+            if (process.env.NODE_ENV === 'development' && !body?.error) {
+                const validationErrorResponse = {
                     error: {
                         code: 'RESPONSE_VALIDATION_ERROR',
-                        message: `Response does not match iOS contract: ${error.message}`,
+                        message: `Response does not match iOS contract: ${validationError.message}`,
                         endpoint,
-                        validationError: error.message
+                        validationError: validationError.message
                     }
-                });
+                };
+                return originalJsonMethod.call(this, validationErrorResponse);
             }
         }
-        return originalJson(body);
+        
+        // Call the next middleware's json method (or original if none)
+        return originalJsonMethod.call(this, body);
     };
+    
     next();
 }
 function validateChallengeEndpoint(body: any, type: string) {

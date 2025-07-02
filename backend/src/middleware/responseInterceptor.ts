@@ -12,14 +12,10 @@ interface ErrorResponse {
 }
 
 /**
- * Response interceptor middleware to ensure consistent error formatting
- * Follows Single Responsibility Principle - only handles response formatting
+ * Event-based response interceptor middleware - NO method overriding to prevent conflicts
+ * Uses Express events to track responses without interfering with other middleware
  */
 export function responseInterceptor(req: Request, res: Response, next: NextFunction): void {
-  // Store original json method
-  const originalJson = res.json.bind(res);
-  const originalSend = res.send.bind(res);
-  
   // Generate correlation ID if not present
   const correlationId = req.headers['x-correlation-id'] as string || 
     req.headers['x-request-id'] as string || 
@@ -28,76 +24,74 @@ export function responseInterceptor(req: Request, res: Response, next: NextFunct
   // Add correlation ID to response headers
   res.setHeader('X-Correlation-ID', correlationId);
   
-  // Override json method
-  res.json = function(data: any): Response {
-    // Ensure consistent error structure for error responses
+  // Store correlation ID for logging
+  (req as any).correlationId = correlationId;
+  
+  // Use event-based approach - listen for response completion
+  res.on('finish', () => {
+    // Log error responses after they're sent (no recursion risk)
     if (res.statusCode >= 400) {
-      if (data && !data.error) {
-        // Transform non-standard error responses
-        const errorResponse: ErrorResponse = {
-          error: {
-            code: determineErrorCode(res.statusCode, data),
-            message: extractErrorMessage(data),
-            correlationId
-          }
-        };
-        
-        // Add validation errors if present
-        if (data.validationErrors || data.errors) {
-          errorResponse.error.validationErrors = data.validationErrors || data.errors;
-        }
-        
-        // Add details if present and not redundant
-        if (data.details && typeof data.details === 'object') {
-          errorResponse.error.details = data.details;
-        }
-        
-        data = errorResponse;
-      } else if (data && data.error) {
-        // Ensure error has correlation ID
-        data.error.correlationId = data.error.correlationId || correlationId;
-        
-        // Ensure error has code
-        if (!data.error.code) {
-          data.error.code = determineErrorCode(res.statusCode, data.error);
-        }
-      }
-    }
-    
-    // Log response for debugging
-    if (res.statusCode >= 400) {
-      logger.error('Error response', {
+      logger.error('Error response sent', {
         correlationId,
         statusCode: res.statusCode,
         path: req.path,
         method: req.method,
-        error: data.error || data
+        userAgent: req.get('User-Agent'),
+        ip: req.ip
       });
     }
-    
-    // Call original json method
-    return originalJson(data);
-  };
-  
-  // Override send method for non-JSON responses
-  res.send = function(data: any): Response {
-    // If sending non-JSON error response, convert to JSON
-    if (res.statusCode >= 400 && typeof data === 'string') {
-      res.setHeader('Content-Type', 'application/json');
-      return res.json({
-        error: {
-          code: determineErrorCode(res.statusCode, {}),
-          message: data,
-          correlationId
-        }
-      });
-    }
-    
-    // Call original send method
-    return originalSend(data);
-  };
+  });
   
   next();
+}
+
+/**
+ * Response formatter utility - call this from route handlers for consistent error formatting
+ * This replaces the method overriding approach and prevents middleware conflicts
+ */
+export function formatErrorResponse(res: Response, statusCode: number, data: any, correlationId?: string): Response {
+  const finalCorrelationId = correlationId || res.getHeader('X-Correlation-ID') as string || generateCorrelationId();
+  
+  // Set correlation ID if not already set
+  if (!res.getHeader('X-Correlation-ID')) {
+    res.setHeader('X-Correlation-ID', finalCorrelationId);
+  }
+  
+  let formattedData = data;
+  
+  if (data && !data.error) {
+    // Transform non-standard error responses
+    const errorResponse: ErrorResponse = {
+      error: {
+        code: determineErrorCode(statusCode, data),
+        message: extractErrorMessage(data),
+        correlationId: finalCorrelationId
+      }
+    };
+    
+    // Add validation errors if present
+    if (data.validationErrors || data.errors) {
+      errorResponse.error.validationErrors = data.validationErrors || data.errors;
+    }
+    
+    // Add details if present and not redundant
+    if (data.details && typeof data.details === 'object') {
+      errorResponse.error.details = data.details;
+    }
+    
+    formattedData = errorResponse;
+  } else if (data && data.error) {
+    // Ensure error has correlation ID
+    data.error.correlationId = data.error.correlationId || finalCorrelationId;
+    
+    // Ensure error has code
+    if (!data.error.code) {
+      data.error.code = determineErrorCode(statusCode, data.error);
+    }
+    formattedData = data;
+  }
+  
+  return res.status(statusCode).json(formattedData);
 }
 
 /**
