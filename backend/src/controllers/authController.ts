@@ -66,6 +66,8 @@ export class AuthController {
       const password_hash = await bcrypt.hash(password, saltRounds);
 
       // Create user
+      logger.info('Creating user with data:', { email, username, first_name, last_name });
+      
       const newUser = await UserService.create({
         email,
         username,
@@ -73,6 +75,8 @@ export class AuthController {
         first_name,
         last_name
       });
+      
+      logger.info('User created successfully:', { id: newUser.id, email: newUser.email });
 
       // Generate token pair using TokenRefreshService
       const deviceInfo = this.extractDeviceInfo(req);
@@ -111,10 +115,17 @@ export class AuthController {
 
     } catch (error) {
       logger.error('Registration error:', error);
+      logger.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : undefined
+      });
+      
       res.status(500).json({
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'Failed to create user'
+          message: 'Failed to create user',
+          details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : 'Unknown error') : undefined
         }
       });
     }
