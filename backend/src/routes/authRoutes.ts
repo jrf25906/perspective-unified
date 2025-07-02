@@ -8,17 +8,17 @@ const router = Router();
 // Public routes
 router.post('/register', 
   validate({ body: AuthValidation.register }),
-  AuthController.register
+  (req, res) => AuthController.register(req, res)
 );
 
 router.post('/login',
   validate({ body: AuthValidation.login }),
-  AuthController.login
+  (req, res) => AuthController.login(req, res)
 );
 
 router.post('/google',
   validate({ body: AuthValidation.googleSignIn }),
-  AuthController.googleSignIn
+  (req, res) => AuthController.googleSignIn(req, res)
 );
 
 // Test route without authentication
@@ -27,9 +27,9 @@ router.get('/test', (req, res) => {
 });
 
 // Protected routes
-router.get('/profile', authenticateToken, AuthController.getProfile);
+router.get('/profile', authenticateToken, (req, res) => AuthController.getProfile(req as any, res));
 // Add /me alias for iOS compatibility
-router.get('/me', authenticateToken, AuthController.getProfile);
+router.get('/me', authenticateToken, (req, res) => AuthController.getProfile(req as any, res));
 
 // Token refresh endpoint - commented out until implemented
 // router.post('/refresh', 
