@@ -14,8 +14,8 @@ export namespace AuthValidation {
     email: string;
     username: string;
     password: string;
-    firstName?: string;
-    lastName?: string;
+    first_name?: string;
+    last_name?: string;
   }
 
   export const register = Joi.object<RegisterBody>({
@@ -28,13 +28,13 @@ export namespace AuthValidation {
       .messages({
         'string.min': 'Password must be at least 8 characters long'
       }),
-    firstName: BaseSchemas.shortString
+    first_name: BaseSchemas.shortString
       .pattern(/^[a-zA-Z\s'-]+$/)
       .messages({
         'string.pattern.base': 'First name can only contain letters, spaces, hyphens, and apostrophes'
       })
       .optional(),
-    lastName: BaseSchemas.shortString
+    last_name: BaseSchemas.shortString
       .pattern(/^[a-zA-Z\s'-]+$/)
       .messages({
         'string.pattern.base': 'Last name can only contain letters, spaces, hyphens, and apostrophes'
