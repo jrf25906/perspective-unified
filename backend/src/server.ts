@@ -36,12 +36,13 @@ const handlePortConflict = (error: NodeJS.ErrnoException) => {
         logger.info('Killed previous process. Retrying in 2 seconds...');
         setTimeout(() => {
           const server = app.listen(serverConfig.port, '0.0.0.0', () => {
-            logger.info(`🚀 Server running on port ${serverConfig.port}`);
+            logger.info(`🚀 Server v1.0.1 running on port ${serverConfig.port} - Auth fixes included`);
             logger.info(`📊 Environment: ${serverConfig.environment}`);
             logger.info(`🔒 Security: Enhanced middleware enabled`);
             logger.info(`🏥 Health check: http://localhost:${serverConfig.port}/health`);
             logger.info(`⚡ Rate limiting: Enabled`);
             logger.info(`💉 Dependency injection: Configured`);
+            logger.info(`🔧 Critical fixes: Await keywords added to transformUserForAPI`);
           });
         }, 2000);
       }
@@ -53,12 +54,13 @@ const handlePortConflict = (error: NodeJS.ErrnoException) => {
 
 // Start server with error handling
 const server = app.listen(serverConfig.port, '0.0.0.0', () => {
-  logger.info(`🚀 Server running on port ${serverConfig.port}`);
+  logger.info(`🚀 Server v1.0.1 running on port ${serverConfig.port} - Auth fixes included`);
   logger.info(`📊 Environment: ${serverConfig.environment}`);
   logger.info(`🔒 Security: Enhanced middleware enabled`);
   logger.info(`🏥 Health check: http://localhost:${serverConfig.port}/health`);
   logger.info(`⚡ Rate limiting: Enabled`);
   logger.info(`💉 Dependency injection: Configured`);
+  logger.info(`🔧 Critical fixes: Await keywords added to transformUserForAPI`);
 }).on('error', handlePortConflict);
 
 export default app; 
