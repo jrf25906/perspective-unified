@@ -1,8 +1,11 @@
 [variables]
 NODE_ENV = "production"
 
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["rm -rf node_modules", "npm cache clean --force", "npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
