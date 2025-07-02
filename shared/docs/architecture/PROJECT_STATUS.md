@@ -7,12 +7,13 @@ This is the **NEW** clean iOS project location. All architecture fixes and impro
 ### **Key Directories:**
 - `perspective.xcodeproj/` - **NEW Xcode project** (use this, not the old one)
 - `perspective/` - **iOS Swift source code** (100 files, architecture-fixed)
-- `backend/` - **Symlink to working backend** (`/Users/jamesfarmer/perspective-app/backend`)
+- `backend/` - **Node.js/TypeScript API server** (unified in this repository)
 - Various `.sh` scripts for build monitoring and verification
 
-### **Old vs New Project:**
-- **OLD (problematic)**: `/Users/jamesfarmer/perspective-app/ios/` - ❌ Don't use
-- **NEW (fixed)**: `/Users/jamesfarmer/Desktop/perspective/` - ✅ Use this
+### **Current Unified Project Structure:**
+- **Unified Repository**: `/Users/jamesfarmer/perspective-unified/` - ✅ Single source of truth
+- **iOS Project**: `ios/perspective.xcodeproj` - ✅ Clean architecture implementation
+- **Backend**: `backend/` - ✅ Node.js/TypeScript API server
 
 ## 🏗️ Architecture Status
 

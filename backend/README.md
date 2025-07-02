@@ -2,7 +2,7 @@
 
 # Perspective Daily Challenge Loop - Proof of Concept
 
-The current MVP focus for the Perspective backend is the **Daily Challenge Loop**, as outlined in the [Perspective PRD v2](link-to-prd). This proof of concept implements the core API functionality to power the daily challenge experience.
+The current MVP focus for the Perspective backend is the **Daily Challenge Loop**. This proof of concept implements the core API functionality to power the daily challenge experience.
 
 **Tech Stack:** Node.js, Express, PostgreSQL, JWT, Knex.js, Joi, Docker, and related tools.
 
@@ -11,7 +11,7 @@ The current MVP focus for the Perspective backend is the **Daily Challenge Loop*
 - Submit user answers
 - Provide instant feedback
 
-The API is designed to support upcoming features such as Echo Score, streak tracking, adaptive challenge routing, and user profiles. For the full product vision and roadmap, refer to the [PRD](link-to-prd).
+The API is designed to support upcoming features such as Echo Score, streak tracking, adaptive challenge routing, and user profiles.
 
 # Backend API Server
 
@@ -35,7 +35,7 @@ Node.js Express backend API server for the Perspective App providing authenticat
 
 - RESTful API design
 - JWT-based authentication
-- PostgreSQL database with Knex.js ORM
+- SQLite database with Knex.js ORM
 - Input validation with Joi
 - Rate limiting and security middleware
 - File upload support
@@ -61,10 +61,7 @@ Node.js Express backend API server for the Perspective App providing authenticat
    # Edit .env with your configuration
    ```
 
-3. Start PostgreSQL (using Docker):
-   ```bash
-   docker-compose up postgres
-   ```
+3. Database setup (SQLite - no additional setup required)
 
 4. Run database migrations:
    ```bash
@@ -78,11 +75,11 @@ Node.js Express backend API server for the Perspective App providing authenticat
 
 ## API Endpoints
 
-See [API Documentation](../docs/API.md) for detailed endpoint information.
+See [API Documentation](../shared/docs/api/) for detailed endpoint information.
 
 ## Database
 
-The application uses PostgreSQL with Knex.js for query building and migrations.
+The application uses SQLite with Knex.js for query building and migrations.
 
 ### Running Migrations
 
@@ -152,6 +149,6 @@ tests/                   # Test files
 
 ## References
 
-- [Perspective PRD v2](link-to-prd)
-- [Design System Documentation](link-to-design-system)
+- [Project Documentation](../shared/docs/)
+- [Architecture Guide](../shared/docs/architecture/)
 - Brand assets and full UX/UI guidelines are available upon request.

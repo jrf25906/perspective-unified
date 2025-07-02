@@ -35,7 +35,7 @@ open ios/perspective.xcodeproj
 
 - **Backend**: Node.js/Express.js with TypeScript
 - **iOS**: Native SwiftUI application
-- **Database**: PostgreSQL (production), SQLite (development)
+- **Database**: SQLite (development), PostgreSQL (production via Railway)
 
 ## 🛠️ Development Commands
 
@@ -72,7 +72,7 @@ open ios/perspective.xcodeproj
 
 1. **Node.js**: ≥18.0.0
 2. **Xcode**: Latest version with iOS SDK
-3. **Database**: PostgreSQL for production, SQLite for development
+3. **Database**: SQLite for development, PostgreSQL for production
 
 ## 📦 Key Features
 

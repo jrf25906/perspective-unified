@@ -1,19 +1,28 @@
-# Perspective App
+# Perspective Unified Documentation
 
-A cross-platform mobile application for perspective sharing and collaboration.
+Documentation for the Perspective bias assessment and news analysis platform.
 
 ## Project Structure
 
-- `android/` - Android native application
-- `ios/` - iOS native application (active project in `ios/Perspective`)
-- `backend/` - Node.js backend API server
-- `shared/` - Shared assets and resources
-- `docs/` - Project documentation
+- `ios/` - iOS SwiftUI application
+- `backend/` - Node.js/TypeScript API server  
+- `shared/` - Shared assets, documentation, and resources
+- `deployment/` - Deployment configurations
+- `build-tools/` - Build automation scripts
+- `testing/` - Integration test scripts
+
+## Documentation Sections
+
+### Architecture
+- [Project Setup Guide](UNIFIED_PROJECT_SETUP.md) - Complete setup instructions
+- [Architecture Documentation](architecture/) - System design and patterns
+- [Deployment Guide](architecture/DEPLOYMENT.md) - Production deployment
+
+### Development
+- [API Documentation](api/) - Backend API reference
+- [Brand Guidelines](brand/) - Design system and branding
+- [iOS Development](ios/) - iOS-specific documentation
 
 ## Getting Started
 
-See the [SETUP.md](docs/SETUP.md) file for detailed setup instructions.
-
-## License
-
-See [LICENSE](LICENSE) file for details.
+See the [Unified Project Setup Guide](UNIFIED_PROJECT_SETUP.md) for complete setup instructions.

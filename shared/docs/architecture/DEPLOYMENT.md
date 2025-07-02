@@ -12,7 +12,7 @@ The backend is deployed on Railway and automatically deploys when changes are pu
 - **Service**: backend
 - **Production URL**: https://backend-production-d218.up.railway.app
 - **API Base URL**: https://backend-production-d218.up.railway.app/api/v1
-- **GitHub Repository**: jrf25906/perspective-2
+- **GitHub Repository**: jrf25906/perspective-unified
 
 ### Automatic Deployment
 
