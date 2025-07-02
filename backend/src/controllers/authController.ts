@@ -90,7 +90,7 @@ export class AuthController {
       );
 
       // Transform user for API response
-      const transformedUser = UserTransformService.transformUserForAPI(newUser);
+      const transformedUser = await UserTransformService.transformUserForAPI(newUser);
       if (!transformedUser) {
         throw new Error('Failed to transform user data');
       }
@@ -226,7 +226,7 @@ export class AuthController {
       );
 
       // Transform user for API response
-      const transformedUser = UserTransformService.transformUserForAPI(user);
+      const transformedUser = await UserTransformService.transformUserForAPI(user);
       if (!transformedUser) {
         throw new Error('Failed to transform user data');
       }
@@ -354,7 +354,7 @@ export class AuthController {
       );
 
       // Transform user for API response
-      const transformedUser = UserTransformService.transformUserForAPI(user);
+      const transformedUser = await UserTransformService.transformUserForAPI(user);
       if (!transformedUser) {
         throw new Error('Failed to transform user data');
       }
@@ -564,7 +564,7 @@ export class AuthController {
       }
 
       // Transform user for API response
-      const transformedUser = UserTransformService.transformUserForAPI(user);
+      const transformedUser = await UserTransformService.transformUserForAPI(user);
       if (!transformedUser) {
         throw new Error('Failed to transform user data');
       }
