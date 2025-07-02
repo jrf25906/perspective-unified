@@ -7,7 +7,7 @@ const testRegistration = async () => {
     username: `testuser${timestamp}`,
     firstName: "Test",
     lastName: "User",
-    password: "Xk9$mNp2@Qr7#vL4"
+    password: "SuperSecure$2025#Pass!"
   };
 
   console.log('Testing registration with data:', testData);
