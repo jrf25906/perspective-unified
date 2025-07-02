@@ -1,5 +1,6 @@
 import express from 'express';
 import { AuthController } from '../controllers/authController';
+import { AuthDebugController } from '../controllers/authDebugController';
 import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
@@ -30,5 +31,11 @@ router.post('/logout-all', authenticateToken, AuthController.logoutAll);
 
 // Get current user profile
 router.get('/me', authenticateToken, AuthController.getProfile);
+
+// Debug endpoints (only in development)
+if (process.env.NODE_ENV === 'development') {
+  router.post('/debug/check-password', AuthDebugController.checkPassword);
+  router.get('/debug/recent-users', AuthDebugController.listRecentUsers);
+}
 
 export default router; 

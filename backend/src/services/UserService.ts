@@ -130,4 +130,10 @@ export class UserService {
       totalTimeSpent: 0
     };
   }
+
+  static async getRecentUsers(limit: number = 10): Promise<User[]> {
+    return db<User>('users')
+      .orderBy('created_at', 'desc')
+      .limit(limit);
+  }
 }
