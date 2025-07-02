@@ -67,6 +67,14 @@ The following environment variables are configured in Railway:
 
 ### Troubleshooting
 
+### ⚠️ Current Known Issue (July 2, 2025)
+
+**Railway deployment is missing API routes.** See [Railway Deployment Troubleshooting Guide](RAILWAY_DEPLOYMENT_TROUBLESHOOTING.md) for detailed analysis and workaround.
+
+**Quick Workaround**: Use local backend for development:
+1. Start local backend: `cd backend && npm run dev`
+2. iOS app configured to use localhost temporarily
+
 #### Deployment Fails
 
 1. Check the build logs in Railway dashboard
