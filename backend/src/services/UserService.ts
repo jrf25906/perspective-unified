@@ -1,5 +1,6 @@
 import db from '../db';
 import { User } from '../models/User';
+import logger from '../utils/logger';
 
 export class UserService {
   static async findByEmailOrUsername(email: string, username: string): Promise<User | undefined> {
@@ -10,29 +11,55 @@ export class UserService {
   }
 
   static async create(userData: Partial<User>): Promise<User> {
-    // Ensure timestamps are set
-    const dataWithTimestamps = {
+    // Ensure all required fields have default values
+    const dataWithDefaults = {
       ...userData,
       created_at: userData.created_at || new Date(),
-      updated_at: userData.updated_at || new Date()
+      updated_at: userData.updated_at || new Date(),
+      is_active: userData.is_active !== undefined ? userData.is_active : true,
+      email_verified: userData.email_verified !== undefined ? userData.email_verified : false,
+      echo_score: userData.echo_score !== undefined ? userData.echo_score : 0,
+      current_streak: userData.current_streak !== undefined ? userData.current_streak : 0,
+      // Ensure password_hash is either a string or null (not undefined)
+      password_hash: userData.password_hash === undefined ? null : userData.password_hash
     };
 
-    // PostgreSQL supports RETURNING, others need a separate query
-    if (db.client.config.client === 'postgresql') {
-      const [user] = await db<User>('users')
-        .insert(dataWithTimestamps)
-        .returning('*');
-      return user;
-    } else {
-      // For SQLite and others, insert then query
-      const [id] = await db<User>('users')
-        .insert(dataWithTimestamps);
-      
-      const user = await db<User>('users').where({ id }).first();
-      if (!user) {
-        throw new Error('Failed to retrieve created user');
+    try {
+      // PostgreSQL supports RETURNING, others need a separate query
+      if (db.client.config.client === 'postgresql') {
+        const [user] = await db<User>('users')
+          .insert(dataWithDefaults)
+          .returning('*');
+        return user;
+      } else {
+        // For SQLite and others, insert then query
+        const [id] = await db<User>('users')
+          .insert(dataWithDefaults);
+        
+        const user = await db<User>('users').where({ id }).first();
+        if (!user) {
+          throw new Error('Failed to retrieve created user');
+        }
+        return user;
       }
-      return user;
+    } catch (error) {
+      logger.error('UserService.create failed:', {
+        error: error instanceof Error ? {
+          message: error.message,
+          code: (error as any).code,
+          detail: (error as any).detail,
+          constraint: (error as any).constraint,
+          column: (error as any).column,
+          table: (error as any).table
+        } : error,
+        userData: {
+          email: userData.email,
+          username: userData.username,
+          hasPassword: !!userData.password_hash,
+          fields: Object.keys(dataWithDefaults)
+        }
+      });
+      throw error;
     }
   }
 
