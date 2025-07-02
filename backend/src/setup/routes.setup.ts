@@ -23,18 +23,38 @@ export function setupHealthCheck(app: Express): void {
 }
 
 export function setupAPIRoutes(app: Express): void {
-  // Main API routes with v1 prefix to match iOS app expectations
-  app.use('/api/v1/auth', authRoutes);
-  // Challenge routes now follow the same /api/v1 prefix pattern
-  app.use('/api/v1/challenge', challengeRoutes);
-  app.use('/api/v1/profile', profileRoutes);
-  app.use('/api/v1/admin', adminRoutes);
-  app.use('/api/v1/content', contentRoutes);
-  app.use('/api/v1/echo-score', echoScoreRoutes);
+  console.log('🔧 Setting up API routes...');
   
-  // Diagnostic routes (development only)
-  if (serverConfig.environment === 'development') {
-    app.use('/api/v1/diagnostics/network', networkDiagnosticRoutes);
+  try {
+    // Main API routes with v1 prefix to match iOS app expectations
+    console.log('📍 Mounting auth routes at /api/v1/auth');
+    app.use('/api/v1/auth', authRoutes);
+    
+    console.log('📍 Mounting challenge routes at /api/v1/challenge');
+    app.use('/api/v1/challenge', challengeRoutes);
+    
+    console.log('📍 Mounting profile routes at /api/v1/profile');
+    app.use('/api/v1/profile', profileRoutes);
+    
+    console.log('📍 Mounting admin routes at /api/v1/admin');
+    app.use('/api/v1/admin', adminRoutes);
+    
+    console.log('📍 Mounting content routes at /api/v1/content');
+    app.use('/api/v1/content', contentRoutes);
+    
+    console.log('📍 Mounting echo-score routes at /api/v1/echo-score');
+    app.use('/api/v1/echo-score', echoScoreRoutes);
+    
+    // Diagnostic routes (development only)
+    if (serverConfig.environment === 'development') {
+      console.log('📍 Mounting diagnostic routes at /api/v1/diagnostics/network');
+      app.use('/api/v1/diagnostics/network', networkDiagnosticRoutes);
+    }
+    
+    console.log('✅ All API routes set up successfully');
+  } catch (error) {
+    console.error('❌ Error setting up API routes:', error);
+    throw error;
   }
 }
 

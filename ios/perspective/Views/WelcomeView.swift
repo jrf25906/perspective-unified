@@ -6,36 +6,58 @@ struct WelcomeView: View {
     
     var body: some View {
         ZStack {
-            VideoBackgroundView(videoName: "welcome_bg", videoType: "mp4")
+            // Brand-aligned enlightenment gradient background
+            Perspective.colors.Gradients.enlightenmentSpectrum
+                .opacity(0.8)
                 .ignoresSafeArea()
-                .allowsHitTesting(false)
             
             VStack {
+                // App branding that shows immediately
+                VStack(spacing: Perspective.spacing.lg) {
+                    // Doorway-inspired icon using brand elements
+                    Image(systemName: "door.left.hand.open")
+                        .font(.system(size: 80, weight: .light))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Perspective.colors.mindClear, Perspective.colors.mindClear.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .shadow(color: Perspective.colors.achievementGold.opacity(0.3), radius: 10, x: 0, y: 5)
+                    
+                    Text("Perspective")
+                        .perspectiveStyle(.displayLarge)
+                        .foregroundColor(Perspective.colors.mindClear)
+                    
+                    Text("Every perspective is a doorway.\nWe help you find the keys.")
+                        .perspectiveStyle(.bodyLarge)
+                        .foregroundColor(Perspective.colors.mindClear.opacity(0.9))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 100)
+                
                 Spacer()
                 
+                // Show doorway-style continue button
                 if showContinueButton {
-                    Button(action: onContinue) {
-                        Text("Continue")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.black.opacity(0.7))
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                            )
-                    }
-                    .padding(.horizontal, 32)
-                    .padding(.bottom, 60)
+                    Perspective.Components.button(
+                        "Open the First Doorway",
+                        icon: "arrow.right",
+                        style: .enlightened,
+                        action: onContinue
+                    )
+                    .padding(.horizontal, 64)
+                    .padding(.bottom, 80)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
             }
         }
         .onAppear {
+            print("🟢 WelcomeView appeared")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation(.easeInOut(duration: 0.5)) {
+                print("🟢 Setting showContinueButton to true")
+                withAnimation(Perspective.animations.doorwayOpen) {
                     showContinueButton = true
                 }
             }

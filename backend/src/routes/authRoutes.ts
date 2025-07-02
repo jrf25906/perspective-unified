@@ -21,6 +21,11 @@ router.post('/google',
   AuthController.googleSignIn
 );
 
+// Test route without authentication
+router.get('/test', (req, res) => {
+  res.json({ message: 'Auth routes are working!' });
+});
+
 // Protected routes
 router.get('/profile', authenticateToken, AuthController.getProfile);
 // Add /me alias for iOS compatibility

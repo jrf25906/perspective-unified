@@ -1,0 +1,41 @@
+# Xcode
+*.xcuserstate
+*.xcuserdatad/
+project.xcworkspace/xcuserdata/
+project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+# SPM Build artifacts
+.swiftpm/
+*.swiftpm/
+.build/
+
+# CocoaPods (if used)
+Pods/
+*.xcworkspace
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection (prevent workspace corruption)
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files created by our scripts
+*.pre-fix-backup
+*.pbxproj.backup
+
+# Build artifacts that can cause GUID conflicts
+DerivedData/
+build/

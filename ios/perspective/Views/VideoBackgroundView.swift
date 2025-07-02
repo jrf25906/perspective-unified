@@ -21,6 +21,27 @@ struct VideoBackgroundView: UIViewRepresentable {
         view.layer.addSublayer(gradientLayer)
         
         // Try to load video with proper error handling
+        print("🎥 Looking for video: \(videoName).\(videoType)")
+        print("🎥 Bundle main path: \(Bundle.main.bundlePath)")
+        
+        if let bundleURL = Bundle.main.url(forResource: videoName, withExtension: videoType) {
+            print("✅ Found video at: \(bundleURL.path)")
+        } else {
+            print("❌ Video file '\(videoName).\(videoType)' not found in bundle")
+            // List all mp4 files in bundle for debugging
+            if let bundlePath = Bundle.main.resourcePath {
+                let fileManager = FileManager.default
+                do {
+                    let files = try fileManager.contentsOfDirectory(atPath: bundlePath)
+                    let mp4Files = files.filter { $0.hasSuffix(".mp4") }
+                    print("📁 Available MP4 files in bundle: \(mp4Files)")
+                } catch {
+                    print("Error listing bundle contents: \(error)")
+                }
+            }
+            return view
+        }
+        
         guard let videoURL = Bundle.main.url(forResource: videoName, withExtension: videoType) else {
             print("⚠️ Video file '\(videoName).\(videoType)' not found in bundle. Using fallback background.")
             return view

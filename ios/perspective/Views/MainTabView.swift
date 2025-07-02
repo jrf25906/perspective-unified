@@ -34,7 +34,7 @@ struct MainTabView: View {
                 }
                 .tag(3)
         }
-        .accentColor(.blue)
+        .accentColor(Perspective.colors.deepInsightBlue) // Use brand primary color
         .preferredColorScheme(.light)
     }
 }

@@ -1,55 +1,58 @@
 import SwiftUI
 
-// MARK: - Material 3 Design System
+// MARK: - Material 3 Design System (Bridged to Perspective Brand)
+// This maintains Material3 API compatibility while using Perspective brand colors
+// Existing code using Material3 components will automatically get the new brand styling
 
 struct Material3 {
     
     // MARK: - Colors
+    // Updated to use Perspective brand colors while maintaining Material3 API
     struct Colors {
-        // Primary colors
-        static let primary = Color.blue
-        static let primaryContainer = Color.blue.opacity(0.1)
-        static let onPrimary = Color.white
-        static let onPrimaryContainer = Color.blue
+        // Primary colors - now using Perspective Deep Insight Blue
+        static let primary = PerspectiveColors.deepInsightBlue
+        static let primaryContainer = PerspectiveColors.Semantic.primaryContainer
+        static let onPrimary = PerspectiveColors.Semantic.onPrimary
+        static let onPrimaryContainer = PerspectiveColors.Semantic.onPrimaryContainer
         
-        // Secondary colors
-        static let secondary = Color.purple
-        static let secondaryContainer = Color.purple.opacity(0.1)
-        static let onSecondary = Color.white
-        static let onSecondaryContainer = Color.purple
+        // Secondary colors - now using Perspective Discovery Teal
+        static let secondary = PerspectiveColors.discoveryTeal
+        static let secondaryContainer = PerspectiveColors.Semantic.secondaryContainer
+        static let onSecondary = PerspectiveColors.Semantic.onSecondary
+        static let onSecondaryContainer = PerspectiveColors.Semantic.onSecondaryContainer
         
-        // Tertiary colors
-        static let tertiary = Color.orange
-        static let tertiaryContainer = Color.orange.opacity(0.1)
-        static let onTertiary = Color.white
-        static let onTertiaryContainer = Color.orange
+        // Tertiary colors - now using Perspective Revelation Purple
+        static let tertiary = PerspectiveColors.revelationPurple
+        static let tertiaryContainer = PerspectiveColors.Semantic.tertiaryContainer
+        static let onTertiary = PerspectiveColors.Semantic.onTertiary
+        static let onTertiaryContainer = PerspectiveColors.Semantic.onTertiaryContainer
         
-        // Error colors
-        static let error = Color.red
-        static let errorContainer = Color.red.opacity(0.1)
-        static let onError = Color.white
-        static let onErrorContainer = Color.red
+        // Error colors - using Perspective semantic colors
+        static let error = PerspectiveColors.Semantic.error
+        static let errorContainer = PerspectiveColors.Semantic.errorContainer
+        static let onError = PerspectiveColors.Semantic.onError
+        static let onErrorContainer = PerspectiveColors.Semantic.onErrorContainer
         
-        // Success colors
-        static let success = Color.green
-        static let successContainer = Color.green.opacity(0.1)
-        static let onSuccess = Color.white
-        static let onSuccessContainer = Color.green
+        // Success colors - now using Perspective Achievement Gold
+        static let success = PerspectiveColors.achievementGold
+        static let successContainer = PerspectiveColors.Semantic.successContainer
+        static let onSuccess = PerspectiveColors.Semantic.onSuccess
+        static let onSuccessContainer = PerspectiveColors.Semantic.onSuccessContainer
         
-        // Surface colors
-        static let surface = Color(red: 1.0, green: 1.0, blue: 1.0)
-        static let surfaceVariant = Color(red: 0.96, green: 0.96, blue: 0.98)
-        static let onSurface = Color(red: 0.1, green: 0.1, blue: 0.1)
-        static let onSurfaceVariant = Color(red: 0.4, green: 0.4, blue: 0.4)
+        // Surface colors - using Perspective semantic colors
+        static let surface = PerspectiveColors.Semantic.surface
+        static let surfaceVariant = PerspectiveColors.Semantic.surfaceVariant
+        static let onSurface = PerspectiveColors.Semantic.onSurface
+        static let onSurfaceVariant = PerspectiveColors.Semantic.onSurfaceVariant
         
-        // Outline colors
-        static let outline = Color(red: 0.7, green: 0.7, blue: 0.7)
-        static let outlineVariant = Color(red: 0.8, green: 0.8, blue: 0.8)
+        // Outline colors - using Perspective semantic colors
+        static let outline = PerspectiveColors.Semantic.outline
+        static let outlineVariant = PerspectiveColors.Semantic.outlineVariant
         
-        // Inverse colors
-        static let inverseSurface = Color(red: 0.1, green: 0.1, blue: 0.1)
-        static let inverseOnSurface = Color(red: 1.0, green: 1.0, blue: 1.0)
-        static let inversePrimary = Color.blue.opacity(0.8)
+        // Inverse colors - using Perspective semantic colors
+        static let inverseSurface = PerspectiveColors.Semantic.inverseSurface
+        static let inverseOnSurface = PerspectiveColors.Semantic.inverseOnSurface
+        static let inversePrimary = PerspectiveColors.Semantic.inversePrimary
     }
     
     // MARK: - Typography
@@ -204,9 +207,9 @@ struct Material3CardStyle: ViewModifier {
     }
 }
 
-struct Material3TextFieldStyle: TextFieldStyle {
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
+struct Material3TextFieldModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
             .font(Material3.Typography.bodyLarge)
             .padding(Material3.Spacing.medium)
             .background(Material3.Colors.surfaceVariant)
@@ -230,7 +233,7 @@ extension View {
     }
     
     func material3TextField() -> some View {
-        self.textFieldStyle(Material3TextFieldStyle())
+        self.modifier(Material3TextFieldModifier())
     }
 }
 

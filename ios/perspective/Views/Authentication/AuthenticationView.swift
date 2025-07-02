@@ -14,9 +14,13 @@ public struct AuthenticationView: View {
     
     public var body: some View {
         ZStack {
-            VideoBackgroundView(videoName: "welcome_bg", videoType: "mp4")
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
+            // Simple gradient background instead of video
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.8)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             // Subtle blue tint to differentiate from WelcomeView
             Color.blue.opacity(0.1)

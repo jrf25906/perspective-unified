@@ -2,10 +2,10 @@
   "name": "perspective-backend",
   "version": "1.0.0",
   "description": "Backend API server for Perspective App",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node dist/server.js",
+    "start": "node dist/index.js",
     "dev": "nodemon --exec ts-node src/server.ts",
     "dev:simple": "SIMPLE_MODE=true nodemon --exec ts-node src/server.ts",
     "pretest": "npm run build",

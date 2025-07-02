@@ -7,6 +7,9 @@ struct ContentView: View {
     @EnvironmentObject var offlineDataManager: OfflineDataManager
     @State private var showWelcome = true
     
+    // Explicit initializer to avoid ambiguity
+    init() {}
+    
     var body: some View {
         Group {
             if showWelcome {
@@ -14,6 +17,9 @@ struct ContentView: View {
                     withAnimation {
                         showWelcome = false
                     }
+                }
+                .onAppear {
+                    print("🟢 Showing WelcomeView")
                 }
             } else if apiService.isAuthenticated {
                 ZStack {
@@ -42,15 +48,25 @@ struct ContentView: View {
                         .animation(.easeInOut, value: offlineDataManager.pendingSyncCount)
                     }
                 }
+                .onAppear {
+                    print("🔵 Showing MainTabView - User is authenticated")
+                }
             } else {
                 AuthenticationView()
+                    .onAppear {
+                        print("🔴 Showing AuthenticationView - User not authenticated")
+                    }
             }
         }
+        .perspectiveDesignSystem() // Initialize Perspective design system
         .onAppear {
+            print("📱 ContentView onAppear - showWelcome: \(showWelcome), isAuthenticated: \(apiService.isAuthenticated)")
             // Check authentication status on app launch
             if apiService.isAuthenticated {
+                print("✅ User already authenticated, skipping welcome")
                 showWelcome = false // Skip welcome if already authenticated
             } else {
+                print("❌ User not authenticated, fetching profile")
                 apiService.fetchProfile()
             }
         }
@@ -61,17 +77,21 @@ struct OfflineIndicatorView: View {
     var body: some View {
         HStack {
             Image(systemName: "wifi.slash")
-                .foregroundColor(.white)
+                .foregroundColor(Perspective.colors.mindClear)
             Text("You're offline")
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(.white)
+                .perspectiveStyle(.labelMedium)
+                .foregroundColor(Perspective.colors.mindClear)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(Color.orange)
-        .cornerRadius(20)
-        .shadow(radius: 4)
+        .padding(.horizontal, Perspective.spacing.md)
+        .padding(.vertical, Perspective.spacing.sm)
+        .background(Perspective.colors.achievementGold) // More brand-aligned than orange
+        .cornerRadius(12)
+        .shadow(
+            color: Perspective.colors.achievementGold.opacity(0.3),
+            radius: 4,
+            x: 0,
+            y: 2
+        )
     }
 }
 
@@ -82,18 +102,22 @@ struct SyncIndicatorView: View {
         HStack {
             ProgressView()
                 .scaleEffect(0.8)
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .progressViewStyle(CircularProgressViewStyle(tint: Perspective.colors.mindClear))
             
             Text("Syncing \(pendingCount) item\(pendingCount == 1 ? "" : "s")...")
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundColor(.white)
+                .perspectiveStyle(.captionLarge)
+                .foregroundColor(Perspective.colors.mindClear)
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color.blue)
-        .cornerRadius(16)
-        .shadow(radius: 2)
+        .padding(.vertical, 4)
+        .background(Perspective.colors.discoveryTeal) // Brand-aligned sync color
+        .cornerRadius(8)
+        .shadow(
+            color: Perspective.colors.discoveryTeal.opacity(0.3),
+            radius: 2,
+            x: 0,
+            y: 1
+        )
     }
 }
 

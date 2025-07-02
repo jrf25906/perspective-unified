@@ -65,12 +65,17 @@ This unified project was created by combining:
 - `/shared/docs/` - Project documentation
 - `/shared/scripts/` - Build and utility scripts
 
-## Railway Deployment
-- **Project ID**: `backend-production-d218`
+## Railway Deployment ✅
+- **Project Name**: `perspective-backend`
+- **Production URL**: `https://backend-production-d218.up.railway.app`
+- **API Base**: `https://backend-production-d218.up.railway.app/api/v1`
+- **Status**: **DEPLOYED AND RUNNING** (June 26, 2025)
 - **Commands**: 
   - `railway login`
-  - `railway link backend-production-d218`
+  - `railway link` (select perspective-backend)
   - `railway up` (from backend directory)
+- **Environment Variables Set**: NODE_ENV, JWT secrets, CORS
+- **Pending**: PostgreSQL database (add via Railway dashboard)
 
 ## Environment Variables
 - Check `.env.example` in backend directory
@@ -82,6 +87,15 @@ This unified project was created by combining:
 - Safe to reference if needed during transition
 
 ## Connection Points Updated
-- Backend routes: `/api/` → `/api/v1/` (in routes.setup.ts)
-- iOS development URL: port 5000 → 3000 (in AppEnvironment.swift)
-- Asset paths: Consolidated to shared/assets/
+- Backend routes: `/api/` → `/api/v1/` (in routes.setup.ts) ✅
+- iOS development URL: port 5000 → 3000 (in AppEnvironment.swift) ✅
+- Asset paths: Consolidated to shared/assets/ ✅
+- Package.json start script: Fixed to use dist/server.js ✅
+- Railway deployment: Root directory issue resolved ✅
+
+## Recent Fixes (June 26, 2025)
+- Fixed TypeScript compilation error in echoScoreScheduler.ts
+- Updated package.json start script to use correct entry point
+- Removed "backend" root directory setting in Railway
+- Created nixpacks.toml and railway.json for proper deployment
+- Successfully deployed to Railway with /api/v1 routes working

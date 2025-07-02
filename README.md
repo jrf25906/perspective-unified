@@ -56,9 +56,10 @@ open ios/perspective.xcodeproj
 - Backend: `http://localhost:3000`
 - iOS connects to: `http://localhost:3000/api/v1`
 
-### Production
+### Production (Live on Railway ✅)
 - Backend: `https://backend-production-d218.up.railway.app`
 - iOS connects to: `https://backend-production-d218.up.railway.app/api/v1`
+- Status: **Deployed and Running** (Last updated: June 26, 2025)
 
 ## 📚 Documentation
 
@@ -83,17 +84,21 @@ open ios/perspective.xcodeproj
 
 ## 🚢 Deployment
 
-### Backend (Railway)
+### Backend (Railway) ✅
+**Current Status**: Deployed and running at `https://backend-production-d218.up.railway.app`
+
+To deploy updates:
 ```bash
 cd backend
-railway login
-railway link backend-production-d218
 railway up
 ```
+
+**Note**: Database (PostgreSQL) needs to be added via Railway dashboard for full production functionality.
 
 ### iOS (App Store)
 - Archive and upload through Xcode
 - Configure signing and provisioning profiles
+- Production API URL is pre-configured
 
 ## 🤝 Contributing
 

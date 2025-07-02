@@ -121,7 +121,7 @@ export class EchoScoreScheduler {
           concurrencyLimit: 10, // Process 10 users concurrently to avoid DB overload
           continueOnError: true,
           onError: (error, user) => {
-            logger.error(`Failed to calculate Echo Score for user ${user.user_id}:`, error.message);
+            logger.error(`Failed to calculate Echo Score for user ${user.user_id}: ${error.message}`);
           }
         }
       );

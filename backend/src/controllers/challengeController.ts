@@ -20,16 +20,24 @@ export const getTodayChallenge = asyncHandler(async (req: AuthenticatedRequest, 
         res.status(404).json({ error: 'No challenge available for today' });
         return;
     }
-    // Log the raw challenge data before transformation
-    logger.info(`🔍 Raw challenge from database: ${JSON.stringify(challenge, null, 2)}`);
+    // Log the raw challenge data before transformation (safely)
+    try {
+        logger.info(`🔍 Raw challenge from database: ${JSON.stringify(challenge, null, 2)}`);
+    } catch (error) {
+        logger.info(`🔍 Raw challenge from database (failed to stringify): ${challenge?.id} - ${challenge?.title}`);
+    }
     // Transform response to match iOS app expectations
     const transformedChallenge = ChallengeTransformService.transformChallengeForAPI(challenge);
     if (!transformedChallenge) {
         res.status(500).json({ error: 'Failed to transform challenge' });
         return;
     }
-    // Log the transformed challenge being sent to iOS
-    logger.info(`📱 Transformed challenge for iOS: ${JSON.stringify(transformedChallenge, null, 2)}`);
+    // Log the transformed challenge being sent to iOS (safely)
+    try {
+        logger.info(`📱 Transformed challenge for iOS: ${JSON.stringify(transformedChallenge, null, 2)}`);
+    } catch (error) {
+        logger.info(`📱 Transformed challenge for iOS (failed to stringify): ${transformedChallenge?.id} - ${transformedChallenge?.title}`);
+    }
     // Validate critical fields exist
     const requiredFields = ['id', 'type', 'title', 'prompt', 'content', 'difficultyLevel', 'createdAt', 'updatedAt'];
     const missingFields = requiredFields.filter(field => transformedChallenge[field] === undefined);

@@ -1,0 +1,17 @@
+# Railway ignore file
+node_modules/
+dist/
+.env
+.env.*
+*.log
+logs/
+uploads/
+dev.sqlite3
+test-*.js
+.DS_Store
+*.md
+docs/
+migrations/
+seeds/
+tests/
+coverage/

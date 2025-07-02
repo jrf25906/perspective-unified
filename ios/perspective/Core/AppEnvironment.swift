@@ -109,7 +109,7 @@ struct FeatureFlags {
 
 // MARK: - Development Configuration
 struct DevelopmentConfig: EnvironmentConfigurable {
-    let apiBaseURL = "http://localhost:3000/api/v1"
+    let apiBaseURL = "https://backend-production-d218.up.railway.app/api/v1"
     let isDebugMode = true
     let apiTimeout: TimeInterval = 30
     let logLevel = LogLevel.verbose
