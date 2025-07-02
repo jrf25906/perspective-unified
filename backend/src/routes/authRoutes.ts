@@ -37,4 +37,11 @@ router.get('/me', authenticateToken, AuthController.getProfile);
 //   AuthController.refreshToken
 // );
 
+// Debug endpoints (only in development)
+if (process.env.NODE_ENV === 'development' || process.env.ENABLE_DEBUG === 'true') {
+  const { AuthDebugController } = require('../controllers/authDebugController');
+  router.post('/debug/check-password', AuthDebugController.checkPassword);
+  router.get('/debug/recent-users', AuthDebugController.listRecentUsers);
+}
+
 export default router; 
