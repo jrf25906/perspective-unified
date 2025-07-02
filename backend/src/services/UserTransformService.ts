@@ -1,6 +1,7 @@
 import logger from '../utils/logger';
 import { User } from '../models/User';
 import { UserStatsService } from './UserStatsService';
+import { SafeUserStatsService } from './SafeUserStatsService';
 import { UserResponse } from '../types/api-contracts';
 
 /**
@@ -72,8 +73,8 @@ export class UserTransformService {
         try {
             logger.debug(`Transforming user ${dbUser.id} for API response`);
             
-            // Get comprehensive user statistics (CRITICAL FIX)
-            const userStats = await UserStatsService.getUserStats(dbUser.id);
+            // Get comprehensive user statistics with safe fallback
+            const userStats = await SafeUserStatsService.getUserStats(dbUser.id);
             
             // Transform dates to ISO8601 format for iOS compatibility
             const transformedUser: APIUserResponse = {
