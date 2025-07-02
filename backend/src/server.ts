@@ -35,7 +35,7 @@ const handlePortConflict = (error: NodeJS.ErrnoException) => {
       } else {
         logger.info('Killed previous process. Retrying in 2 seconds...');
         setTimeout(() => {
-          const server = app.listen(serverConfig.port, () => {
+          const server = app.listen(serverConfig.port, '0.0.0.0', () => {
             logger.info(`🚀 Server running on port ${serverConfig.port}`);
             logger.info(`📊 Environment: ${serverConfig.environment}`);
             logger.info(`🔒 Security: Enhanced middleware enabled`);
@@ -52,7 +52,7 @@ const handlePortConflict = (error: NodeJS.ErrnoException) => {
 };
 
 // Start server with error handling
-const server = app.listen(serverConfig.port, () => {
+const server = app.listen(serverConfig.port, '0.0.0.0', () => {
   logger.info(`🚀 Server running on port ${serverConfig.port}`);
   logger.info(`📊 Environment: ${serverConfig.environment}`);
   logger.info(`🔒 Security: Enhanced middleware enabled`);
