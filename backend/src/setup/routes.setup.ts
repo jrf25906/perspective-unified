@@ -9,6 +9,7 @@ import echoScoreRoutes from '../routes/echoScoreRoutes';
 import networkDiagnosticRoutes from '../routes/networkDiagnosticRoutes';
 import databaseDiagnosticRoutes from '../routes/databaseDiagnosticRoutes';
 import debugRoutes from '../routes/debugRoutes';
+import testRoutes from '../routes/test';
 import errorHandler from '../middleware/errorHandler';
 
 export function setupHealthCheck(app: Express): void {
@@ -56,6 +57,9 @@ export function setupAPIRoutes(app: Express): void {
     
     console.log('📍 Mounting debug routes at /api/v1/debug');
     app.use('/api/v1/debug', debugRoutes);
+    
+    console.log('📍 Mounting test routes at /api/v1/test');
+    app.use('/api/v1/test', testRoutes);
     
     console.log('✅ All API routes set up successfully');
   } catch (error) {
