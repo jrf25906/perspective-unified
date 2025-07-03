@@ -5,6 +5,15 @@ import { validate, AuthValidation } from '../validation';
 
 const router = Router();
 
+// Version check endpoint
+router.get('/version', (req, res) => {
+  res.json({ 
+    version: '1.0.2-fixed',
+    message: 'JWT fixes applied',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Public routes
 router.post('/register', 
   validate({ body: AuthValidation.register }),
@@ -44,4 +53,4 @@ if (process.env.NODE_ENV === 'development' || process.env.ENABLE_DEBUG === 'true
   router.get('/debug/recent-users', AuthDebugController.listRecentUsers);
 }
 
-export default router; 
+export default router;
