@@ -8,7 +8,7 @@
           "cmds": ["npm ci --no-cache"]
         },
         "build": {
-          "cmds": ["npm run build"]
+          "cmds": ["rm -rf dist", "npm run build"]
         }
       }
     }
