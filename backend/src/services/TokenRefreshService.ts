@@ -94,8 +94,8 @@ export class TokenRefreshService {
       };
 
       const accessTokenOptions: SignOptions = {
-        jwtid: jti,
-        expiresIn: this.ACCESS_TOKEN_EXPIRY
+        jwtid: jti
+        // Don't set expiresIn since exp is already in payload
       };
 
       const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret, accessTokenOptions);
@@ -110,8 +110,8 @@ export class TokenRefreshService {
       };
 
       const refreshTokenOptions: SignOptions = {
-        jwtid: refreshJti,
-        expiresIn: `${this.REFRESH_TOKEN_EXPIRY_DAYS}d`
+        jwtid: refreshJti
+        // Don't set expiresIn since exp is already in payload
       };
 
       const refreshToken = jwt.sign(refreshTokenPayload, config.security.refreshTokenSecret, refreshTokenOptions);
@@ -188,8 +188,8 @@ export class TokenRefreshService {
       };
 
       const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret, {
-        jwtid: jti,
-        expiresIn: this.ACCESS_TOKEN_EXPIRY
+        jwtid: jti
+        // Don't set expiresIn since exp is already in payload
       });
 
       logger.info('Access token refreshed', {
