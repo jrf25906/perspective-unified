@@ -2,10 +2,10 @@
 NODE_ENV = "production"
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm ci --no-cache"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "npm start"
+cmd = "node start-production.js"
