@@ -8,6 +8,69 @@ import db from '../db';
 
 const router = Router();
 
+// Get password hash for debugging
+router.get('/get-hash/:email', async (req, res) => {
+  try {
+    const user = await db('users')
+      .where('email', req.params.email)
+      .select('id', 'email', 'password_hash')
+      .first();
+      
+    if (!user) {
+      return res.json({ error: 'User not found' });
+    }
+    
+    res.json({
+      userId: user.id,
+      email: user.email,
+      hasHash: !!user.password_hash,
+      hashLength: user.password_hash?.length || 0,
+      firstChars: user.password_hash?.substring(0, 7) || null,
+      lastChars: user.password_hash?.slice(-4) || null
+    });
+  } catch (error: any) {
+    res.json({
+      error: error.message
+    });
+  }
+});
+
+// Test password verification
+router.post('/verify-password', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const user = await db('users')
+      .where('email', email)
+      .select('id', 'password_hash')
+      .first();
+      
+    if (!user) {
+      return res.json({ error: 'User not found' });
+    }
+    
+    if (!user.password_hash) {
+      return res.json({ error: 'User has no password hash' });
+    }
+    
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    
+    res.json({
+      userId: user.id,
+      passwordProvided: !!password,
+      passwordLength: password?.length || 0,
+      hashExists: true,
+      hashLength: user.password_hash.length,
+      isValid
+    });
+  } catch (error: any) {
+    res.json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // Run migrations (DANGEROUS - for emergency use only)
 router.post('/run-migrations', async (req, res) => {
   try {
