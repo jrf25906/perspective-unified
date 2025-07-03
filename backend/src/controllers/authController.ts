@@ -79,7 +79,7 @@ export class AuthController {
       logger.info('User created successfully:', { id: newUser.id, email: newUser.email });
 
       // Generate token pair using TokenRefreshService
-      const deviceInfo = this.extractDeviceInfo(req);
+      const deviceInfo = AuthController.extractDeviceInfo(req);
       const tokenPair = await TokenRefreshService.generateTokenPair(
         {
           id: newUser.id,
@@ -215,7 +215,7 @@ export class AuthController {
       }
 
       // Generate token pair
-      const deviceInfo = this.extractDeviceInfo(req);
+      const deviceInfo = AuthController.extractDeviceInfo(req);
       const tokenPair = await TokenRefreshService.generateTokenPair(
         {
           id: user.id,
@@ -343,7 +343,7 @@ export class AuthController {
       await UserService.updateLastActivity(user.id);
 
       // Generate token pair
-      const deviceInfo = this.extractDeviceInfo(req);
+      const deviceInfo = AuthController.extractDeviceInfo(req);
       const tokenPair = await TokenRefreshService.generateTokenPair(
         {
           id: user.id,
@@ -415,7 +415,7 @@ export class AuthController {
       logger.info('Token refresh requested', { correlationId });
 
       // Refresh token using TokenRefreshService
-      const deviceInfo = this.extractDeviceInfo(req);
+      const deviceInfo = AuthController.extractDeviceInfo(req);
       const newTokenPair = await TokenRefreshService.refreshAccessToken(refreshToken, deviceInfo);
 
       logger.info('Token refresh successful', { correlationId });
