@@ -10,6 +10,7 @@ import networkDiagnosticRoutes from '../routes/networkDiagnosticRoutes';
 import databaseDiagnosticRoutes from '../routes/databaseDiagnosticRoutes';
 import debugRoutes from '../routes/debugRoutes';
 import testRoutes from '../routes/test';
+import tempDiagnosticRoutes from '../routes/tempDiagnosticRoutes';
 import errorHandler from '../middleware/errorHandler';
 
 export function setupHealthCheck(app: Express): void {
@@ -60,6 +61,9 @@ export function setupAPIRoutes(app: Express): void {
     
     console.log('📍 Mounting test routes at /api/v1/test');
     app.use('/api/v1/test', testRoutes);
+    
+    console.log('📍 Mounting temporary diagnostic routes at /api/v1/temp-diag');
+    app.use('/api/v1/temp-diag', tempDiagnosticRoutes);
     
     console.log('✅ All API routes set up successfully');
   } catch (error) {

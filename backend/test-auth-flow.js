@@ -1,71 +1,71 @@
 const axios = require('axios');
 
-const API_BASE = 'https://backend-production-d218.up.railway.app/api/v1';
-const TEST_USER = {
-  email: 'iostest' + Date.now() + '@example.com',
-  username: 'iostest' + Date.now(),
-  password: 'testpass123',
-  first_name: 'iOS',
-  last_name: 'Test'
-};
-
 async function testAuthFlow() {
-  console.log('Testing auth flow with:', {
-    email: TEST_USER.email,
-    username: TEST_USER.username
-  });
-
+  const baseURL = 'https://backend-production-d218.up.railway.app/api/v1/auth';
+  
+  console.log('Testing authentication flow...\n');
+  
+  // Test 1: Try login with user's credentials
+  console.log('1. Testing login with existing account...');
   try {
-    // 1. Test Registration
-    console.log('\n1. Testing Registration...');
-    const registerResponse = await axios.post(`${API_BASE}/auth/register`, TEST_USER);
-    console.log('✅ Registration successful');
-    console.log('   User ID:', registerResponse.data.user.id);
-    console.log('   Token received:', registerResponse.data.token.substring(0, 20) + '...');
-    
-    // Wait a moment
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 2. Test Login with same credentials
-    console.log('\n2. Testing Login...');
-    const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
-      email: TEST_USER.email,
-      password: TEST_USER.password
+    const loginResponse = await axios.post(`${baseURL}/login`, {
+      username: 'jimmy',
+      password: 'SuperSecure$2025#Pass\!'
+    }, {
+      validateStatus: () => true,
+      timeout: 10000
     });
-    console.log('✅ Login successful');
-    console.log('   User ID:', loginResponse.data.user.id);
-    console.log('   Token received:', loginResponse.data.token.substring(0, 20) + '...');
     
-    // 3. Test authenticated request
-    console.log('\n3. Testing Authenticated Request...');
-    const meResponse = await axios.get(`${API_BASE}/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${loginResponse.data.token}`
-      }
-    });
-    console.log('✅ Authenticated request successful');
-    console.log('   User email:', meResponse.data.user.email);
-    
-    // 4. Test password verification (debug endpoint)
-    console.log('\n4. Testing Password Verification...');
-    try {
-      const debugResponse = await axios.post(`${API_BASE}/auth/debug/check-password`, {
-        email: TEST_USER.email,
-        password: TEST_USER.password
-      });
-      console.log('✅ Password verification:', debugResponse.data.passwordTest?.isValid ? 'VALID' : 'INVALID');
-      console.log('   Hash rounds:', debugResponse.data.passwordTest?.hashRounds);
-    } catch (error) {
-      console.log('⚠️  Debug endpoint not available (production mode?)');
+    console.log('Login status:', loginResponse.status);
+    if (loginResponse.status === 200) {
+      console.log('✅ LOGIN SUCCESSFUL\!');
+      console.log('User:', loginResponse.data.user?.email);
+      console.log('Has tokens:', \!\!loginResponse.data.accessToken && \!\!loginResponse.data.refreshToken);
+    } else {
+      console.log('❌ Login failed:', loginResponse.data?.error?.message);
     }
-    
   } catch (error) {
-    console.error('❌ Error:', error.response?.data || error.message);
-    if (error.response?.data?.error) {
-      console.error('   Error details:', error.response.data.error);
+    console.log('❌ Login error:', error.message);
+  }
+  
+  // Test 2: Try registration with a new account
+  console.log('\n2. Testing new registration...');
+  const timestamp = Date.now();
+  try {
+    const regResponse = await axios.post(`${baseURL}/register`, {
+      email: `test${timestamp}@example.com`,
+      username: `testuser${timestamp}`,
+      password: `Test${timestamp}\!@#$`,
+      firstName: 'Test',
+      lastName: 'User'
+    }, {
+      validateStatus: () => true,
+      timeout: 10000
+    });
+    
+    console.log('Registration status:', regResponse.status);
+    if (regResponse.status === 201) {
+      console.log('✅ REGISTRATION SUCCESSFUL\!');
+      console.log('User:', regResponse.data.user?.email);
+      console.log('Has tokens:', \!\!regResponse.data.accessToken && \!\!regResponse.data.refreshToken);
+    } else {
+      console.log('❌ Registration failed:', regResponse.data?.error?.message);
+      if (regResponse.data?.error?.details) {
+        console.log('Error details:', regResponse.data.error.details);
+      }
     }
+  } catch (error) {
+    console.log('❌ Registration error:', error.message);
+  }
+  
+  // Test 3: Check version endpoint
+  console.log('\n3. Checking deployment version...');
+  try {
+    const versionResponse = await axios.get(`${baseURL}/version`);
+    console.log('Version info:', versionResponse.data);
+  } catch (error) {
+    console.log('Version check error:', error.message);
   }
 }
 
-// Run the test
 testAuthFlow();
