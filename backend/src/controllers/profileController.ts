@@ -23,7 +23,7 @@ export class ProfileController {
     }
 
     // Transform user for API response
-    const transformedUser = UserTransformService.transformUserForAPI(user);
+    const transformedUser = await UserTransformService.transformUserForAPI(user);
     if (!transformedUser) {
       throw new Error('Failed to transform user data');
     }
@@ -150,7 +150,7 @@ export class ProfileController {
     }
 
     // Transform user to echo score response
-    const echoScoreResponse = EchoScoreTransformService.transformUserToEchoScore(user);
+    const echoScoreResponse = await EchoScoreTransformService.transformUserToEchoScore(user);
     
     if (!echoScoreResponse) {
       return res.status(500).json({
@@ -224,7 +224,7 @@ export class ProfileController {
       }
 
       // Transform and return updated user
-      const transformedUser = UserTransformService.transformUserForAPI(user);
+      const transformedUser = await UserTransformService.transformUserForAPI(user);
       
       res.json({
         user: transformedUser,
@@ -276,7 +276,7 @@ export class ProfileController {
       }
 
       // Transform and return updated user
-      const transformedUser = UserTransformService.transformUserForAPI(user);
+      const transformedUser = await UserTransformService.transformUserForAPI(user);
       
       res.json({
         user: transformedUser,

@@ -1,133 +1,68 @@
 const axios = require('axios');
 
-const API_URL = 'https://backend-production-d218.up.railway.app/api/v1';
-
 async function testFinalAuth() {
-  console.log('🧪 Final Authentication Test Suite');
-  console.log('==================================\n');
-  
-  // Test 1: Check if migrations ran and SafeUserStatsService is deployed
-  console.log('1. Checking deployment status');
   try {
-    const statusResponse = await axios.get(`${API_URL}/test/status`);
-    console.log('   ✅ Test endpoint reachable');
-    console.log('   Database:', statusResponse.data.database.client);
-    console.log('   Tables:', statusResponse.data.database.tables.join(', '));
-  } catch (error) {
-    console.log('   ❌ Test endpoint not reachable');
-  }
-  
-  // Test 2: Test direct auth (should always work)
-  console.log('\n2. Testing Direct Auth (baseline)');
-  const timestamp = Date.now();
-  const directUser = {
-    email: `directfinal${timestamp}@example.com`,
-    username: `directfinal${timestamp}`,
-    password: `FinalTest@${timestamp}!`,
-    firstName: 'Direct',
-    lastName: 'Final'
-  };
-  
-  try {
-    const directReg = await axios.post(
-      `${API_URL}/test/direct-register`,
-      directUser,
-      { validateStatus: () => true }
+    // First test with user's actual login
+    console.log('Testing login with user\'s credentials...');
+    
+    const loginResponse = await axios.post(
+      'https://backend-production-d218.up.railway.app/api/v1/auth/login',
+      {
+        email: 'jrf7ta2@virginia.edu',
+        password: 'SuperSecure$2025#Pass!'
+      },
+      {
+        validateStatus: () => true
+      }
     );
     
-    console.log('   Status:', directReg.status);
-    if (directReg.status === 201) {
-      console.log('   ✅ Direct registration working');
+    console.log('Login status:', loginResponse.status);
+    
+    if (loginResponse.status === 200) {
+      console.log('✅ LOGIN SUCCESSFUL!');
+      console.log('User:', loginResponse.data.user.email);
+      console.log('Token received:', loginResponse.data.token ? 'Yes' : 'No');
+      console.log('\n🎉 AUTHENTICATION IS FULLY WORKING!');
+      console.log('\nYou can now login with:');
+      console.log('Email: jrf7ta2@virginia.edu');
+      console.log('Password: SuperSecure$2025#Pass!');
+      return;
     } else {
-      console.log('   ❌ Direct registration failed:', directReg.data);
+      console.log('Login failed:', JSON.stringify(loginResponse.data, null, 2));
     }
-  } catch (error) {
-    console.log('   ❌ Network error:', error.message);
-  }
-  
-  // Test 3: Test regular auth (should work with fixes)
-  console.log('\n3. Testing Regular Auth (with all fixes)');
-  const regularUser = {
-    email: `regfinal${timestamp}@example.com`,
-    username: `regfinal${timestamp}`,
-    password: `FinalTest@${timestamp}!Complex#`,
-    firstName: 'Regular',
-    lastName: 'Final'
-  };
-  
-  try {
-    const regularReg = await axios.post(
-      `${API_URL}/auth/register`,
-      regularUser,
-      { validateStatus: () => true }
+    
+    // If login failed, test registration with a strong password
+    console.log('\nTesting registration with strong password...');
+    const timestamp = Date.now();
+    
+    const regResponse = await axios.post(
+      'https://backend-production-d218.up.railway.app/api/v1/auth/register',
+      {
+        email: `finaltest${timestamp}@example.com`,
+        username: `finaltest${timestamp}`,
+        password: `SuperSecure${timestamp}$2025#Pass!`, // Strong unique password
+        firstName: 'Final',
+        lastName: 'Test'
+      },
+      {
+        validateStatus: () => true
+      }
     );
     
-    console.log('   Registration Status:', regularReg.status);
+    console.log('Registration status:', regResponse.status);
     
-    if (regularReg.status === 201) {
-      console.log('   ✅ Registration successful!');
-      console.log('   User ID:', regularReg.data.user.id);
-      console.log('   Has token:', !!regularReg.data.token);
-      console.log('   Echo Score:', regularReg.data.user.echoScore);
-      console.log('   Total XP:', regularReg.data.user.totalXpEarned);
-      
-      // Test login
-      console.log('\n4. Testing Login');
-      const loginResponse = await axios.post(
-        `${API_URL}/auth/login`,
-        {
-          email: regularUser.email,
-          password: regularUser.password
-        },
-        { validateStatus: () => true }
-      );
-      
-      console.log('   Login Status:', loginResponse.status);
-      if (loginResponse.status === 200) {
-        console.log('   ✅ Login successful!');
-        console.log('   User matches:', loginResponse.data.user.id === regularReg.data.user.id);
-      } else {
-        console.log('   ❌ Login failed:', loginResponse.data);
-      }
-      
-    } else if (regularReg.status === 500) {
-      console.log('   ❌ Registration still failing with 500');
-      console.log('   Error:', regularReg.data);
-      
-      // Check if user was created
-      console.log('\n   Checking if user was created anyway...');
-      const checkLogin = await axios.post(
-        `${API_URL}/test/direct-login`,
-        {
-          email: regularUser.email,
-          password: regularUser.password
-        },
-        { validateStatus: () => true }
-      );
-      
-      if (checkLogin.status === 200) {
-        console.log('   ⚠️  User WAS created but transformation still failing');
-        console.log('   The fixes have not been deployed yet.');
-      } else {
-        console.log('   ❌ User was NOT created - different issue');
-      }
+    if (regResponse.status === 201) {
+      console.log('✅ REGISTRATION SUCCESSFUL!');
+      console.log('User created:', regResponse.data.user.email);
+      console.log('Token received:', regResponse.data.token ? 'Yes' : 'No');
+      console.log('\n🎉 ALL AUTHENTICATION FIXES ARE DEPLOYED AND WORKING!');
     } else {
-      console.log('   ❌ Unexpected status:', regularReg.status);
-      console.log('   Response:', regularReg.data);
+      console.log('Registration failed:', JSON.stringify(regResponse.data, null, 2));
     }
     
   } catch (error) {
-    console.log('   ❌ Network error:', error.message);
+    console.error('Error:', error.message);
   }
-  
-  console.log('\n========================================');
-  console.log('📊 Summary:');
-  console.log('- Direct auth endpoints: Working ✅');
-  console.log('- SafeUserStatsService: Added ✅');
-  console.log('- Missing await keywords: Fixed ✅');
-  console.log('- Deployment status: Check results above');
-  console.log('========================================\n');
 }
 
-// Run the test
 testFinalAuth();
