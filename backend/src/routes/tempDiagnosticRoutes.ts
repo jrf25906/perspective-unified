@@ -4,8 +4,41 @@ import { UserTransformService } from '../services/UserTransformService';
 import { TokenRefreshService } from '../services/TokenRefreshService';
 import bcrypt from 'bcryptjs';
 import logger from '../utils/logger';
+import db from '../db';
 
 const router = Router();
+
+// Check table existence
+router.get('/check-tables', async (req, res) => {
+  try {
+    const tables = ['users', 'refresh_tokens', 'user_challenge_stats', 'echo_scores'];
+    const results: any = {};
+    
+    for (const table of tables) {
+      try {
+        const count = await db(table).count('* as count');
+        results[table] = {
+          exists: true,
+          count: parseInt(String(count[0].count))
+        };
+      } catch (error: any) {
+        results[table] = {
+          exists: false,
+          error: error.message
+        };
+      }
+    }
+    
+    res.json({
+      tables: results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
 
 // Temporary diagnostic endpoint for debugging production issues
 router.post('/test-login', async (req, res) => {
@@ -157,7 +190,13 @@ router.post('/test-login', async (req, res) => {
       error: error.message,
       errorType: error.constructor.name,
       diagnostics,
-      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
+      stack: error.stack, // Always include stack for debugging
+      fullError: {
+        message: error.message,
+        code: error.code,
+        name: error.name,
+        details: error.details || error.detail || error.sqlMessage || error.hint
+      }
     });
   }
 });
