@@ -8,6 +8,33 @@ import db from '../db';
 
 const router = Router();
 
+// Run migrations (DANGEROUS - for emergency use only)
+router.post('/run-migrations', async (req, res) => {
+  try {
+    // Only allow in production if explicitly requested
+    if (req.body.confirmRun !== 'YES_RUN_MIGRATIONS') {
+      return res.status(400).json({
+        error: 'Must confirm migration run with confirmRun: YES_RUN_MIGRATIONS'
+      });
+    }
+    
+    const knex = db;
+    const result = await knex.migrate.latest();
+    
+    res.json({
+      success: true,
+      batch: result[0],
+      migrations: result[1],
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // Check table existence
 router.get('/check-tables', async (req, res) => {
   try {
