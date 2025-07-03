@@ -93,12 +93,8 @@ export class TokenRefreshService {
         exp: Math.floor(accessTokenExpiresAt.getTime() / 1000)
       };
 
-      const accessTokenOptions: SignOptions = {
-        jwtid: jti
-        // Don't set expiresIn since exp is already in payload
-      };
-
-      const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret, accessTokenOptions);
+      // Don't set any SignOptions since jti and exp are already in payload
+      const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret);
 
       // Generate refresh token
       const refreshTokenPayload: RefreshTokenPayload = {
@@ -109,12 +105,8 @@ export class TokenRefreshService {
         exp: Math.floor(refreshTokenExpiresAt.getTime() / 1000)
       };
 
-      const refreshTokenOptions: SignOptions = {
-        jwtid: refreshJti
-        // Don't set expiresIn since exp is already in payload
-      };
-
-      const refreshToken = jwt.sign(refreshTokenPayload, config.security.refreshTokenSecret, refreshTokenOptions);
+      // Don't set any SignOptions since jti and exp are already in payload
+      const refreshToken = jwt.sign(refreshTokenPayload, config.security.refreshTokenSecret);
 
       // Store refresh token in database
       await this.storeRefreshToken(refreshToken, refreshJti, user.id, refreshTokenExpiresAt, deviceInfo);
@@ -187,10 +179,8 @@ export class TokenRefreshService {
         exp: Math.floor(accessTokenExpiresAt.getTime() / 1000)
       };
 
-      const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret, {
-        jwtid: jti
-        // Don't set expiresIn since exp is already in payload
-      });
+      // Don't set any SignOptions since jti and exp are already in payload
+      const accessToken = jwt.sign(accessTokenPayload, config.security.jwtSecret);
 
       logger.info('Access token refreshed', {
         userId: user.id,
