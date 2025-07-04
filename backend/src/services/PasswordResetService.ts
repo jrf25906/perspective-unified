@@ -26,7 +26,7 @@ export class PasswordResetService {
       const user = await UserService.findByEmail(email);
       if (!user) {
         // Don't reveal if user exists or not
-        logger.warn('Password reset requested for non-existent email:', email);
+        logger.warn('Password reset requested for non-existent email', { email });
         return null;
       }
 
@@ -48,7 +48,7 @@ export class PasswordResetService {
         used: false
       });
 
-      logger.info('Password reset token created for user:', user.id);
+      logger.info('Password reset token created for user', { userId: user.id });
       return { token, userId: user.id };
     } catch (error) {
       logger.error('Failed to create password reset token:', error);
@@ -118,7 +118,7 @@ export class PasswordResetService {
           updated_at: new Date()
         });
 
-      logger.info('Password reset successful for user:', verification.userId);
+      logger.info('Password reset successful for user', { userId: verification.userId });
       return true;
     } catch (error) {
       logger.error('Failed to reset password:', error);
@@ -145,7 +145,7 @@ export class PasswordResetService {
           updated_at: new Date()
         });
 
-      logger.info('Direct password reset for user:', user.id);
+      logger.info('Direct password reset for user', { userId: user.id });
       return true;
     } catch (error) {
       logger.error('Failed to directly reset password:', error);
