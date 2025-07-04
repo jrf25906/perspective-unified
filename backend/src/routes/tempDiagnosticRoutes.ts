@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { UserService } from '../services/UserService';
 import { UserTransformService } from '../services/UserTransformService';
 import { TokenRefreshService } from '../services/TokenRefreshService';
+import { PasswordResetService } from '../services/PasswordResetService';
 import bcrypt from 'bcryptjs';
 import logger from '../utils/logger';
 import db from '../db';
@@ -313,6 +314,127 @@ router.get('/test-user/:email', async (req, res) => {
     res.status(500).json({
       error: error.message,
       errorType: error.constructor.name
+    });
+  }
+});
+
+// EMERGENCY PASSWORD RESET ENDPOINTS
+// These bypass email verification for testing
+
+// Request password reset token
+router.post('/reset-password-request', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    
+    const result = await PasswordResetService.createResetToken(email);
+    
+    if (result) {
+      // In production, you'd send this token via email
+      // For testing, we're returning it directly
+      res.json({
+        success: true,
+        token: result.token,
+        userId: result.userId,
+        resetUrl: `/api/v1/temp-diag/reset-password/${result.token}`,
+        message: 'Use this token to reset your password'
+      });
+    } else {
+      // Don't reveal if user exists
+      res.json({
+        success: true,
+        message: 'If the email exists, a reset token has been generated'
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// Verify reset token
+router.get('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const verification = await PasswordResetService.verifyToken(token);
+    
+    res.json({
+      valid: verification.valid,
+      email: verification.email,
+      message: verification.valid ? 'Token is valid' : 'Token is invalid or expired'
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// Reset password with token
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+    
+    if (!newPassword) {
+      return res.status(400).json({ error: 'New password is required' });
+    }
+    
+    const success = await PasswordResetService.resetPassword(token, newPassword);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: 'Password reset successful! You can now login with your new password.'
+      });
+    } else {
+      res.status(400).json({
+        error: 'Invalid or expired token'
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// EMERGENCY: Direct password reset (no token required)
+router.post('/emergency-reset', async (req, res) => {
+  try {
+    const { email, newPassword, confirmEmergency } = req.body;
+    
+    if (confirmEmergency !== 'YES_EMERGENCY_RESET') {
+      return res.status(400).json({
+        error: 'Must confirm with confirmEmergency: YES_EMERGENCY_RESET'
+      });
+    }
+    
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: 'Email and newPassword are required' });
+    }
+    
+    const success = await PasswordResetService.directPasswordReset(email, newPassword);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: 'Password reset successful! You can now login with your new password.',
+        email
+      });
+    } else {
+      res.status(400).json({
+        error: 'Failed to reset password'
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack
     });
   }
 });
